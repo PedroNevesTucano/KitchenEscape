@@ -19,8 +19,10 @@ public class NodeScript : MonoBehaviour
     [SerializeField] private bool brokenCrateInstantiated;
     [SerializeField] private bool bananaPeelInstantiated;
     [SerializeField] private bool pathInstantiated;
+    [SerializeField] private bool wallInstantiated;
 
     private GameObject crateInstance;
+    private GameObject instantiatedWall;
     private GameObject bananaPeelInstance;
     private GameObject enemyPlacementNodeInstance;
     private GameObject allyPlacementNodeInstance;
@@ -32,10 +34,7 @@ public class NodeScript : MonoBehaviour
 
     void Start()
     {
-        if (gameObject.tag == "Wall")
-        {
-            Instantiate(WallPrefab, new Vector3(transform.position.x, 1f, transform.position.z), Quaternion.identity);
-        }
+       
 
         if (gameObject.tag == "Crate")
         {
@@ -47,6 +46,16 @@ public class NodeScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (gameObject.tag == "Wall" && !wallInstantiated)
+        {
+            instantiatedWall = Instantiate(WallPrefab, new Vector3(transform.position.x, 1f, transform.position.z), Quaternion.identity);
+            wallInstantiated = true;
+        } 
+        if (gameObject.tag != "Wall" && wallInstantiated)
+        {
+            Destroy(instantiatedWall);
+        }
+
         if (gameManager.gameState != GameData.GameState.CharacterPlacement && gameObject.tag == "EnemyPlacementNode")
         {
             Destroy(enemyPlacementNodeInstance);

@@ -70,6 +70,9 @@ public class SelectedCharImageUIScript : MonoBehaviour
                 case "Pumpkin(Clone)":
                     IMG.texture = PumpkinIMG;
                     break;
+                case "PeaPod(Clone)":
+                    IMG.texture = PumpkinIMG;
+                    break;
                 case "Banana(Clone)":
                     IMG.texture = BananaIMG;
                     break;
@@ -91,6 +94,9 @@ public class SelectedCharImageUIScript : MonoBehaviour
                 switch (charPlacement.name)
                 {
                     case "PlacementLemon(Clone)":
+                        IMG.texture = LemonIMG;
+                        break;
+                    case "PlacementPeaPod(Clone)":
                         IMG.texture = LemonIMG;
                         break;
                     case "PlacementPumpkin(Clone)":

@@ -21,7 +21,7 @@ public class SharedCharacterAttributesScript : MonoBehaviour
     public enum AttackType { Circle, Square, Triangle, Diamond };
     public enum AttackDistance { Melee, Ranged };
     public enum Effect { None, Prone, Burning };
-    public enum Ability { None, BananaPeel, AcidicScorch, RollingThunder, WeepingShield };
+    public enum Ability { None, BananaPeel, AcidicScorch, RollingThunder, WeepingShield, PodAttack };
 
     [Header("Location In Grid")]
     [SerializeField] public int currentGridX;

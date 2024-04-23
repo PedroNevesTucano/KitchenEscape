@@ -10,6 +10,7 @@ public class CharPlacementButtonScript : MonoBehaviour
     [Header("Assigned Elements")]
     [SerializeField] public GameObject OnionPlacementPrefab;
     [SerializeField] public GameObject LemonPlacementPrefab;
+    [SerializeField] public GameObject PeaPodPlacementPrefab;
     [SerializeField] public GameObject BananaPlacementPrefab;
     [SerializeField] public GameObject PumpkinPlacementPrefab;
     [SerializeField] public GameData gameManager;
@@ -29,6 +30,7 @@ public class CharPlacementButtonScript : MonoBehaviour
         Onion,
         Banana,
         Pumpkin,
+        PeaPod,
         Lemon
     }
 
@@ -50,6 +52,9 @@ public class CharPlacementButtonScript : MonoBehaviour
                 break;
             case ButtonChar.Lemon:
                 buttonText.text = " " + buttonNumber.ToString() + ") " + "Lemon";
+                break;
+            case ButtonChar.PeaPod:
+                buttonText.text = " " + buttonNumber.ToString() + ") " + "PeaPod";
                 break;
             case ButtonChar.Banana:
                 buttonText.text = " " + buttonNumber.ToString() + ") " + "Banana";
@@ -128,6 +133,9 @@ public class CharPlacementButtonScript : MonoBehaviour
                     break;
                 case ButtonChar.Lemon:
                     instantiatedPrefab = Instantiate(LemonPlacementPrefab);
+                    break;
+                case ButtonChar.PeaPod:
+                    instantiatedPrefab = Instantiate(PeaPodPlacementPrefab);
                     break;
                 case ButtonChar.Pumpkin:
                     instantiatedPrefab = Instantiate(PumpkinPlacementPrefab);

@@ -23,6 +23,7 @@ TagManager:
   - BananaPeel
   - Pumpkin
   - MeatForkChef
+  - PeaPod
   layers:
   - Default
   - TransparentFX

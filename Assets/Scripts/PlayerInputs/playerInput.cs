@@ -11,6 +11,7 @@ public class playerInput : MonoBehaviour
     [SerializeField] public bool initialBurningDamage = true;
     [SerializeField] public int turnsBurning;
     [SerializeField] public int turnsProne;
+    [SerializeField] public int turnsWithCloud;
     [SerializeField] private SharedCharacterAttributesScript selectedCharacter = null;
 
     [Header("Assigned Elements")]
@@ -23,8 +24,10 @@ public class playerInput : MonoBehaviour
     [SerializeField] public GameObject abilityPath;
     [SerializeField] public GameObject Onion;
     [SerializeField] public GameObject Lemon;
+    [SerializeField] public GameObject PeaPod;
     [SerializeField] public GameObject Banana;
     [SerializeField] public GameObject Pumpkin;
+    [SerializeField] public GameObject neighborObject;
     [SerializeField] public GameData gameManager;
     [SerializeField] public AttackButton attackButtonScript;
     [SerializeField] public AbilityButton abilityButtonScript;
@@ -125,7 +128,7 @@ public class playerInput : MonoBehaviour
 
                 // Basic Attack
 
-                if (Input.GetMouseButtonDown(0) && CharFound && !SelectedCharacterBool && gameManager.gameState == GameData.GameState.PlayerTurn && attackButtonScript.attacking && !characterOnNode.attacked && characterOnNode.allyCharacter)
+                if (Input.GetMouseButtonDown(0) && CharFound && !SelectedCharacterBool && gameManager.gameState == GameData.GameState.PlayerTurn && attackButtonScript.attacking && !characterOnNode.attacked && characterOnNode.allyCharacter && characterOnNode.range == SharedCharacterAttributesScript.AttackDistance.Melee)
                 {
                     selectedCharacter = characterOnNode;
                     SelectedCharacterBool = true;
@@ -136,10 +139,56 @@ public class playerInput : MonoBehaviour
                         Instantiate(attackablePath, new Vector3(neighbor.transform.position.x, 0.52f, neighbor.transform.position.z), Quaternion.identity);
                     }
                 }
-                else if (Input.GetMouseButtonDown(0) && selectedCharacter && gameManager.gameState == GameData.GameState.PlayerTurn && attackButtonScript.attacking && !selectedCharacter.attacked)
+                else if (Input.GetMouseButtonDown(0) && selectedCharacter && gameManager.gameState == GameData.GameState.PlayerTurn && attackButtonScript.attacking && !selectedCharacter.attacked && selectedCharacter.range == SharedCharacterAttributesScript.AttackDistance.Melee)
                 {
 
                     List<GameObject> neighbors = gridManager.GetNeighborsAttack(selectedCharacter.currentGridX, selectedCharacter.currentGridY);
+                    foreach (GameObject neighbor in neighbors)
+                    {
+                        if (hit.collider.gameObject.CompareTag("Crate") && hit.collider.gameObject == neighbor)
+                        {
+                            selectedCharacter.attacked = true;
+                            attackButtonScript.attacking = false;
+                            hit.collider.gameObject.tag = "BrokenCrate";
+                            break;
+                        }
+
+                        else if (characterOnNode && !characterOnNode.allyCharacter && hit.collider.gameObject == neighbor)
+                        {
+                            selectedCharacter.attacked = true;
+                            attackButtonScript.attacking = false;
+
+                            CalculateAttackDamage(selectedCharacter, characterOnNode);
+                            break;
+                        }
+                    }
+
+                    GameObject[] walkablePaths = GameObject.FindGameObjectsWithTag("WalkablePath");
+                    foreach (GameObject path in walkablePaths)
+                    {
+                        Destroy(path);
+                    }
+
+                    attackButtonScript.attacking = false;
+                    SelectedCharacterBool = false;
+                    selectedCharacter = null;
+                }
+
+                if (Input.GetMouseButtonDown(0) && CharFound && !SelectedCharacterBool && gameManager.gameState == GameData.GameState.PlayerTurn && attackButtonScript.attacking && !characterOnNode.attacked && characterOnNode.allyCharacter && characterOnNode.range == SharedCharacterAttributesScript.AttackDistance.Ranged)
+                {
+                    selectedCharacter = characterOnNode;
+                    SelectedCharacterBool = true;
+
+                    List<GameObject> neighbors = gridManager.GetNeighborsRangeAttack(characterOnNode.currentGridX, characterOnNode.currentGridY);
+                    foreach (GameObject neighbor in neighbors)
+                    {
+                        Instantiate(attackablePath, new Vector3(neighbor.transform.position.x, 0.52f, neighbor.transform.position.z), Quaternion.identity);
+                    }
+                }
+                else if (Input.GetMouseButtonDown(0) && selectedCharacter && gameManager.gameState == GameData.GameState.PlayerTurn && attackButtonScript.attacking && !selectedCharacter.attacked && selectedCharacter.range == SharedCharacterAttributesScript.AttackDistance.Ranged)
+                {
+
+                    List<GameObject> neighbors = gridManager.GetNeighborsRangeAttack(selectedCharacter.currentGridX, selectedCharacter.currentGridY);
                     foreach (GameObject neighbor in neighbors)
                     {
                         if (hit.collider.gameObject.CompareTag("Crate") && hit.collider.gameObject == neighbor)
@@ -191,6 +240,9 @@ public class playerInput : MonoBehaviour
                         case SharedCharacterAttributesScript.Ability.RollingThunder:
                             neighbors = gridManager.GetNeighborsAttack(characterOnNode.currentGridX, characterOnNode.currentGridY);
                             break;
+                        case SharedCharacterAttributesScript.Ability.PodAttack:
+                            neighbors = gridManager.GetNeighborsWalk(characterOnNode.currentGridX, characterOnNode.currentGridY);
+                            break;
                         case SharedCharacterAttributesScript.Ability.None:
                             Debug.Log("None");
                             break;
@@ -218,6 +270,9 @@ public class playerInput : MonoBehaviour
                         case SharedCharacterAttributesScript.Ability.AcidicScorch:
                         case SharedCharacterAttributesScript.Ability.RollingThunder:
                             neighbors = gridManager.GetNeighborsAttack(selectedCharacter.currentGridX, selectedCharacter.currentGridY);
+                            break;
+                        case SharedCharacterAttributesScript.Ability.PodAttack:
+                            neighbors = gridManager.GetNeighborsWalk(selectedCharacter.currentGridX, selectedCharacter.currentGridY);
                             break;
                         case SharedCharacterAttributesScript.Ability.None:
                             Debug.Log("None");
@@ -252,6 +307,17 @@ public class playerInput : MonoBehaviour
                                         characterOnNode.currentEffect = SharedCharacterAttributesScript.Effect.Burning;
                                         selectedCharacter.usedAbility = true;
                                     }
+                                    break;
+                                case SharedCharacterAttributesScript.Ability.PodAttack:
+                                 
+                                    neighborObject = neighbor as GameObject;
+                                    if (neighborObject != null)
+                                    {
+                                        neighborObject.tag = "Wall"; 
+                                    }
+                                    selectedCharacter.usedAbility = true; 
+
+                                    selectedCharacter.usedAbility = true;
                                     break;
                                 case SharedCharacterAttributesScript.Ability.RollingThunder:
                                     if (characterOnNode && !characterOnNode.allyCharacter && hit.collider.gameObject == neighbor)
@@ -314,6 +380,9 @@ public class playerInput : MonoBehaviour
                         case CharPlacementScript.CharType.Lemon:
                             setCharType(CharPlacementScript.CharType.Lemon, hit.collider.gameObject.transform.position, x, y);
                             break;
+                        case CharPlacementScript.CharType.PeaPod:
+                            setCharType(CharPlacementScript.CharType.PeaPod, hit.collider.gameObject.transform.position, x, y);
+                            break;
                         case CharPlacementScript.CharType.Banana:
                             setCharType(CharPlacementScript.CharType.Banana, hit.collider.gameObject.transform.position, x, y);
                             break;
@@ -369,6 +438,19 @@ public class playerInput : MonoBehaviour
                         character.currentEffect = SharedCharacterAttributesScript.Effect.None;
                     }
                 }
+            }
+        }
+
+        if (neighborObject != null)
+        {
+            if (gameManager.gameState != turnScript.previousState)
+            {
+                turnsWithCloud++;
+            }
+            if (turnsWithCloud >= 3)
+            {
+                turnsWithCloud = 0;
+                neighborObject.tag = "Untagged";
             }
         }
 
@@ -496,6 +578,9 @@ public class playerInput : MonoBehaviour
         {
             case CharPlacementScript.CharType.Lemon:
                 newChar = Instantiate(Lemon, position, Quaternion.identity);
+                break;
+            case CharPlacementScript.CharType.PeaPod:
+                newChar = Instantiate(PeaPod, position, Quaternion.identity);
                 break;
             case CharPlacementScript.CharType.Banana:
                 newChar = Instantiate(Banana, position, Quaternion.identity);

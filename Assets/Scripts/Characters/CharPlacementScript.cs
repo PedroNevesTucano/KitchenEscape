@@ -15,6 +15,7 @@ public class CharPlacementScript : MonoBehaviour
         Onion,
         Banana,
         Pumpkin,
+        PeaPod,
         Lemon
     }
 

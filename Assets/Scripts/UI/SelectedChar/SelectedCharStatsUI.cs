@@ -34,6 +34,7 @@ public class SelectedCharStatsUI : MonoBehaviour
     public Texture2D RangedIcon;
 
     [SerializeField] public GameObject Lemon;
+    [SerializeField] public GameObject PeaPod;
     [SerializeField] public GameObject Pumpkin;
     [SerializeField] public GameObject Banana;
     [SerializeField] public GameObject Onion;
@@ -85,6 +86,9 @@ public class SelectedCharStatsUI : MonoBehaviour
                 {
                     case "PlacementLemon(Clone)":
                         attributesToDisplay = Lemon.GetComponent<SharedCharacterAttributesScript>();
+                        break;
+                    case "PlacementPeaPod(Clone)":
+                        attributesToDisplay = PeaPod.GetComponent<SharedCharacterAttributesScript>();
                         break;
                     case "PlacementPumpkin(Clone)":
                         attributesToDisplay = Pumpkin.GetComponent<SharedCharacterAttributesScript>();

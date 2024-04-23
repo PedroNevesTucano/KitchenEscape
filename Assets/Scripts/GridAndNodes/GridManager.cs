@@ -138,6 +138,50 @@ public class GridManager : MonoBehaviour
         return neighbors;
     }
 
+    public List<GameObject> GetNeighborsRangeAttack(int x, int y)
+    {
+        List<GameObject> neighbors = new List<GameObject>();
+
+        // Offsets for directly adjacent blocks
+        int[,] directOffsets = new int[,] { { 0, -1 }, { 0, 1 }, { -1, 0 }, { 1, 0 } };
+        // Offsets for one more block in each direction
+        int[,] extendedOffsets = new int[,] { { 0, -2 }, { 0, 2 }, { -2, 0 }, { 2, 0 } };
+        // Offsets for diagonal blocks
+        int[,] diagonalOffsets = new int[,] { { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } };
+
+        // Add directly adjacent blocks and diagonals
+        for (int i = 0; i < 4; i++)
+        {
+            // Add direct adjacent block
+            AddNeighborIfValid(x + directOffsets[i, 0], y + directOffsets[i, 1], neighbors);
+            // Add block one more step away in the same direction
+            AddNeighborIfValid(x + extendedOffsets[i, 0], y + extendedOffsets[i, 1], neighbors);
+            // Add diagonals around the character
+            AddNeighborIfValid(x + diagonalOffsets[i, 0], y + diagonalOffsets[i, 1], neighbors);
+        }
+
+        return neighbors;
+    }
+
+    private void AddNeighborIfValid(int x, int y, List<GameObject> neighbors)
+    {
+        if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight)
+        {
+            GameObject neighborNode = nodesGrid[x][y];
+
+            if (!neighborNode.CompareTag("Wall"))
+            {
+                SharedCharacterAttributesScript characterOnNode;
+                if (!IsCharacterOnNode(x, y, out characterOnNode) || !characterOnNode.allyCharacter)
+                {
+                    neighbors.Add(neighborNode);
+                }
+            }
+        }
+    }
+
+
+
     public List<GameObject> GetNeighborsAlly(int x, int y)
     {
         List<GameObject> neighbors = new List<GameObject>();
